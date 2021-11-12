@@ -13,6 +13,9 @@ import (
 
 	"emperror.dev/errors"
 	"github.com/gorilla/websocket"
+
+	"github.com/starshine-sys/mutiny/store"
+	"github.com/starshine-sys/mutiny/store/defaultstore"
 )
 
 // ErrWSAlreadyOpen is returned when you attempt to open
@@ -34,6 +37,7 @@ type Gateway struct {
 	listening  chan interface{}
 
 	Handler *Handler
+	Store   store.Store
 
 	LastPing, LastPong time.Time
 
@@ -57,12 +61,14 @@ func New(url, token string) *Gateway {
 		url:         url,
 		token:       token,
 		Handler:     NewHandler(),
+		Store:       defaultstore.New(),
 		pingRate:    time.Duration(10+r) * time.Second,
 		MaximumPong: 3 * time.Minute,
 	}
 
 	// yes i'm using the Handler for internal methods, might as well
 	g.Handler.AddHandler(g.handlePong)
+	g.Handler.AddHandler(g.handleReady)
 
 	return g
 }

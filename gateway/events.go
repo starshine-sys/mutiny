@@ -11,6 +11,13 @@ type UnknownEvent struct {
 	RawData []byte
 }
 
+// ReadyEvent ...
+type ReadyEvent struct {
+	Users    []revolt.User    `json:"users"`
+	Servers  []revolt.Server  `json:"servers"`
+	Channels []revolt.Channel `json:"channels"`
+}
+
 // MessageEvent ...
 type MessageEvent struct {
 	revolt.Message
