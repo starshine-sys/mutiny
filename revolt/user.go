@@ -16,6 +16,11 @@ type User struct {
 	Online bool    `json:"online"`
 }
 
+// Mention returns a formatted mention.
+func (u User) Mention() string {
+	return "<@" + u.ID + ">"
+}
+
 // Badges ...
 type Badges uint16
 

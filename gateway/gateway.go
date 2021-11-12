@@ -22,13 +22,15 @@ import (
 // a websocket that already is open.
 const ErrWSAlreadyOpen = errors.Sentinel("websocket already opened")
 
-// WSDebug is called for debug logging.
+// WSDebug is called for websocket debug logging.
 var WSDebug = func(tmpl string, args ...interface{}) {
 	return
 }
 
-// WSBuffer is the buffer size of the event channel.
-var WSBuffer = 10
+// StoreDebug is called for store debug logging.
+var StoreDebug = func(tmpl string, args ...interface{}) {
+	return
+}
 
 // Gateway is a gateway client.
 type Gateway struct {
@@ -68,7 +70,7 @@ func New(url, token string) *Gateway {
 
 	// yes i'm using the Handler for internal methods, might as well
 	g.Handler.AddHandler(g.handlePong)
-	g.Handler.AddHandler(g.handleReady)
+	g.Handler.AddHandler(g.handleStoreEvent)
 
 	return g
 }
@@ -172,15 +174,19 @@ func (g *Gateway) heartbeat(conn *websocket.Conn, listening <-chan interface{}) 
 	ticker := time.NewTicker(g.pingRate)
 	defer ticker.Stop()
 
+	WSDebug("Ping interval is %v", g.pingRate)
+
 	for {
 		g.RLock()
 		last := g.LastPong
 		g.RUnlock()
 
-		WSDebug("Sending ping")
+		dat := time.Now().UnixNano()
+
+		WSDebug("Sending ping, data: %v", dat)
 		err := g.conn.WriteJSON(ping{
 			Type: "Ping",
-			Data: time.Now().UnixNano(),
+			Data: dat,
 		})
 		if err != nil || time.Since(last) > g.MaximumPong {
 			if err != nil {
@@ -237,7 +243,9 @@ func (g *Gateway) listen(conn *websocket.Conn, listening <-chan interface{}) {
 }
 
 func (g *Gateway) handlePong(p *ping) {
-	WSDebug("Received pong event, data: %v", p.Data)
+	t := time.Unix(0, p.Data)
+
+	WSDebug("Received pong event, data: %v / ping: %v", p.Data, time.Since(t))
 
 	g.Lock()
 	g.LastPing = time.Unix(0, p.Data)

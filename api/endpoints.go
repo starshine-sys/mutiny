@@ -4,5 +4,6 @@ package api
 const (
 	EndpointQueryNode = "/"
 	EndpointChannels  = "/channels/"
-	EndpointMessages  = "/messages"
+	EndpointMessages  = "/messages/"
+	EndpointUsers     = "/users/"
 )

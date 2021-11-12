@@ -39,8 +39,18 @@ func (c *Client) SendMessageComplex(channelID string, data SendMessageData) (*re
 }
 
 // SendMessage sends a text message.
-func (c *Client) SendMessage(channelID, content string) (*revolt.Message, error) {
+func (c *Client) SendMessage(channelID string, content string) (*revolt.Message, error) {
 	return c.SendMessageComplex(channelID, SendMessageData{
 		Content: content,
 	})
+}
+
+// EditMessage edits the given message's content.
+func (c *Client) EditMessage(channelID, msgID string, content string) error {
+	dat := struct {
+		Content string `json:"content"`
+	}{Content: content}
+
+	err := c.RequestJSON(nil, "PATCH", EndpointChannels+channelID+EndpointMessages+msgID, httputil.WithJSONBody(dat))
+	return err
 }

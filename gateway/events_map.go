@@ -7,4 +7,9 @@ var eventCreators = map[string]func() interface{}{
 	"Message":       func() interface{} { return new(MessageEvent) },
 	"MessageUpdate": func() interface{} { return new(MessageUpdateEvent) },
 	"MessageDelete": func() interface{} { return new(MessageDeleteEvent) },
+	"ChannelCreate": func() interface{} { return new(ChannelCreateEvent) },
+	"ChannelUpdate": func() interface{} { return new(ChannelUpdateEvent) },
+
+	"ChannelStartTyping": func() interface{} { return new(ChannelStartTypingEvent) },
+	"ChannelStopTyping":  func() interface{} { return new(ChannelStopTypingEvent) },
 }
